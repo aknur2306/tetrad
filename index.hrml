@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Персональный дневник</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: var(--bg-color, #f4f4f4);
+            color: var(--text-color, #333);
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        .entry {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            background-color: white;
+        }
+        button {
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .dark-mode {
+            --bg-color: #333;
+            --text-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Персональный дневник</h1>
+        <button onclick="toggleTheme()">Сменить тему</button>
+        <textarea id="noteInput" placeholder="Введите вашу запись..."></textarea>
+        <button onclick="saveNote()">Сохранить</button>
+        <div id="notesContainer"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", loadNotes);
+
+        function saveNote() {
+            let text = document.getElementById("noteInput").value.trim();
+            if (!text) return;
+            let notes = JSON.parse(localStorage.getItem("diaryNotes")) || [];
+            let newNote = { text, date: new Date().toLocaleString() };
+            notes.push(newNote);
+            localStorage.setItem("diaryNotes", JSON.stringify(notes));
+            document.getElementById("noteInput").value = "";
+            loadNotes();
+        }
+
+        function loadNotes() {
+            let notes = JSON.parse(localStorage.getItem("diaryNotes")) || [];
+            let container = document.getElementById("notesContainer");
+            container.innerHTML = "";
+            notes.forEach((note, index) => {
+                let div = document.createElement("div");
+                div.classList.add("entry");
+                div.innerHTML = `<p>${note.text}</p><small>${note.date}</small><br>
+                    <button onclick="deleteNote(${index})">Удалить</button>`;
+                container.appendChild(div);
+            });
+        }
+
+        function deleteNote(index) {
+            let notes = JSON.parse(localStorage.getItem("diaryNotes")) || [];
+            notes.splice(index, 1);
+            localStorage.setItem("diaryNotes", JSON.stringify(notes));
+            loadNotes();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
+</body>
+</html>
